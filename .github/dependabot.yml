@@ -1,0 +1,15 @@
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # OpenTelemetry packages must move together.
+      opentelemetry:
+        patterns: ['OpenTelemetry*']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
