@@ -410,12 +410,6 @@
           "Skeleton.SharedKernel": "[1.0.0, )"
         }
       },
-      "skeleton.modules.other": {
-        "type": "Project",
-        "dependencies": {
-          "Skeleton.Modules.Sample": "[1.0.0, )"
-        }
-      },
       "skeleton.modules.sample": {
         "type": "Project",
         "dependencies": {
