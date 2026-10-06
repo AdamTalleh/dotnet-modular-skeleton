@@ -32,6 +32,9 @@ csharp_style_prefer_primary_constructors = true:suggestion
 # Unused usings fail `dotnet format --verify-no-changes`
 dotnet_diagnostic.IDE0005.severity = warning
 
+# C#-only codebase: names like `Error` that clash with VB keywords are fine
+dotnet_diagnostic.CA1716.severity = none
+
 # Naming: private fields _camelCase
 dotnet_naming_rule.private_fields_underscore.symbols = private_fields
 dotnet_naming_rule.private_fields_underscore.style = underscore_camel
