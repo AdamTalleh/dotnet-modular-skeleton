@@ -8,4 +8,9 @@
     <Project Path="src/Skeleton.Host/Skeleton.Host.csproj" />
     <Project Path="src/Skeleton.SharedKernel/Skeleton.SharedKernel.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Skeleton.ArchitectureTests/Skeleton.ArchitectureTests.csproj" />
+    <Project Path="tests/Skeleton.Host.IntegrationTests/Skeleton.Host.IntegrationTests.csproj" />
+    <Project Path="tests/Skeleton.Modules.Sample.Tests/Skeleton.Modules.Sample.Tests.csproj" />
+  </Folder>
 </Solution>
