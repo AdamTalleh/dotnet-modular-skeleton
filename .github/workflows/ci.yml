@@ -51,6 +51,19 @@ jobs:
           path: TestResults/*.cobertura.*.xml
           if-no-files-found: warn
 
+      # Proves the repo still works as a `dotnet new` template: renamed product must restore, format-check, build and pass tests.
+      # Skipped automatically in generated products (they have no .template.config).
+      - name: Verify template
+        if: hashFiles('.template.config/template.json') != ''
+        run: |
+          dotnet new install ./
+          dotnet new modular-skeleton -n Acme.Ci -o "$RUNNER_TEMP/acme"
+          cd "$RUNNER_TEMP/acme"
+          dotnet restore
+          dotnet format --verify-no-changes --no-restore
+          dotnet build -c Release --no-restore
+          dotnet test --solution Acme.Ci.slnx -c Release --no-build
+
   container:
     name: Publish container image
     needs: build
