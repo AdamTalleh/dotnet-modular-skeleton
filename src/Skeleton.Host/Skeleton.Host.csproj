@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Skeleton.SharedKernel\Skeleton.SharedKernel.csproj" />
+    <ProjectReference Include="..\Modules\Sample\Skeleton.Modules.Sample\Skeleton.Modules.Sample.csproj" />
   </ItemGroup>
 
 </Project>

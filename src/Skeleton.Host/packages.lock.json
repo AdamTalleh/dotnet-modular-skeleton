@@ -88,6 +88,16 @@
           "OpenTelemetry.Api": "1.19.1"
         }
       },
+      "skeleton.modules.sample": {
+        "type": "Project",
+        "dependencies": {
+          "Skeleton.Modules.Sample.Contracts": "[1.0.0, )",
+          "Skeleton.SharedKernel": "[1.0.0, )"
+        }
+      },
+      "skeleton.modules.sample.contracts": {
+        "type": "Project"
+      },
       "skeleton.sharedkernel": {
         "type": "Project"
       }

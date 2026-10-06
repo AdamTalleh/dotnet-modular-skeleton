@@ -1,4 +1,9 @@
 <Solution>
+  <Folder Name="/Modules/" />
+  <Folder Name="/Modules/Sample/">
+    <Project Path="src/Modules/Sample/Skeleton.Modules.Sample.Contracts/Skeleton.Modules.Sample.Contracts.csproj" />
+    <Project Path="src/Modules/Sample/Skeleton.Modules.Sample/Skeleton.Modules.Sample.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Skeleton.Host/Skeleton.Host.csproj" />
     <Project Path="src/Skeleton.SharedKernel/Skeleton.SharedKernel.csproj" />

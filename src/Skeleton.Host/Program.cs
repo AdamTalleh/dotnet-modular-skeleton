@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Scalar.AspNetCore;
 using Skeleton.Host;
+using Skeleton.Modules.Sample;
 using Skeleton.SharedKernel;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,12 +9,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Every module is listed here explicitly. Add a module = add one entry.
 IModule[] modules =
 [
+    new SampleModule(),
 ];
 
 builder.AddObservability();
 
 builder.Services.AddProblemDetails();
-builder.Services.AddValidation();
 builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 builder.Services.AddWebDefaults(builder.Configuration);
