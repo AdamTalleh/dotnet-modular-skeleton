@@ -4,13 +4,6 @@ using Microsoft.Extensions.Options;
 
 namespace Skeleton.Host;
 
-internal sealed class CorsSettings
-{
-    public const string Section = "Cors";
-
-    public string[] AllowedOrigins { get; init; } = [];
-}
-
 internal sealed class RateLimitingSettings
 {
     public const string Section = "RateLimiting";
@@ -27,13 +20,13 @@ internal static class WebDefaultsExtensions
     public static IServiceCollection AddWebDefaults(this IServiceCollection services, IConfiguration configuration)
     {
         // CORS: no origins configured = no policy = cross-origin requests are refused.
-        var cors = configuration.GetSection(CorsSettings.Section).Get<CorsSettings>() ?? new CorsSettings();
+        var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
         services.AddCors(options =>
         {
-            if (cors.AllowedOrigins.Length > 0)
+            if (allowedOrigins.Length > 0)
             {
                 options.AddDefaultPolicy(policy => policy
-                    .WithOrigins(cors.AllowedOrigins)
+                    .WithOrigins(allowedOrigins)
                     .AllowAnyHeader()
                     .AllowAnyMethod());
             }
