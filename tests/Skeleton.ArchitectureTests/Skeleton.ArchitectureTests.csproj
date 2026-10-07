@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="NetArchTest.Rules" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The Host references every module, so all module assemblies land in this test's output folder. -->
+    <ProjectReference Include="..\..\src\Skeleton.Host\Skeleton.Host.csproj" />
+  </ItemGroup>
+
+</Project>

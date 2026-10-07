@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*.*.*']
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+
+      # NuGetAudit + TreatWarningsAsErrors: restore fails on known vulnerable packages (direct and transitive).
+      - name: Restore
+        run: dotnet restore --locked-mode
+
+      - name: Verify formatting
+        run: dotnet format --verify-no-changes --no-restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      - name: Test
+        run: dotnet test --solution Skeleton.slnx -c Release --no-build --coverlet --coverlet-output-format cobertura --results-directory TestResults
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage
+          path: TestResults/*.cobertura.*.xml
+          if-no-files-found: warn
+
+      # Proves the repo still works as a `dotnet new` template: renamed product must restore, format-check, build and pass tests.
+      # Skipped automatically in generated products (they have no .template.config).
+      - name: Verify template
+        if: hashFiles('.template.config/template.json') != ''
+        run: |
+          dotnet new install ./
+          dotnet new modular-skeleton -n Acme.Ci -o "$RUNNER_TEMP/acme"
+          cd "$RUNNER_TEMP/acme"
+          dotnet restore
+          dotnet format --verify-no-changes --no-restore
+          dotnet build -c Release --no-restore
+          dotnet test --solution Acme.Ci.slnx -c Release --no-build
+
+  container:
+    name: Publish container image
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Compute image name and tags
+        id: meta
+        run: |
+          echo "repository=${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+          tags="sha-${GITHUB_SHA::7}"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            tags="$tags;${GITHUB_REF_NAME#v}"
+          else
+            tags="$tags;latest"
+          fi
+          echo "tags=$tags" >> "$GITHUB_OUTPUT"
+
+      # SDK container publish (no Dockerfile). Registry credentials are read from these env vars.
+      - name: Publish image to GHCR
+        env:
+          DOTNET_CONTAINER_REGISTRY_UNAME: ${{ github.actor }}
+          DOTNET_CONTAINER_REGISTRY_PWORD: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ steps.meta.outputs.repository }}
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: >
+          dotnet publish src/Skeleton.Host -c Release -t:PublishContainer
+          -p:ContainerRegistry=ghcr.io
+          -p:ContainerRepository="$REPOSITORY"
+          -p:ContainerImageTags=\"$TAGS\"
