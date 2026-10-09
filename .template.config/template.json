@@ -26,7 +26,8 @@
             "**/obj/**",
             "TestResults/**",
             "**/*.user",
-            "README.md"
+            "README.md",
+            "PROGRESS.md"
           ]
         }
       ]
