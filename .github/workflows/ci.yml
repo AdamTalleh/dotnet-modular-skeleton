@@ -5,6 +5,8 @@ on:
     branches: [main]
     tags: ['v*.*.*']
   pull_request:
+  # Also lets dependabot-lockfiles.yml re-run CI after it pushes (GITHUB_TOKEN pushes don't trigger workflows).
+  workflow_dispatch:
 
 permissions:
   contents: read

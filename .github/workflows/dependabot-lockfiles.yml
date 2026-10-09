@@ -1,0 +1,95 @@
+name: Dependabot lock files
+
+# Dependabot only updates the lock file of the project that references a package directly, so projects that get it
+# transitively (e.g. tests referencing Host) fail `restore --locked-mode` with NU1004. This refreshes every lock file
+# and commits the result back to the Dependabot branch.
+on:
+  pull_request:
+    paths:
+      - Directory.Packages.props
+      - '**/*.csproj'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dependabot-lockfiles-${{ github.head_ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  # Restore runs with a read-only token: package content never shares a job with write access.
+  refresh:
+    name: Refresh lock files
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Restore and rewrite lock files
+        run: dotnet restore --force-evaluate
+
+      - name: Diff lock files
+        id: diff
+        run: |
+          git diff --binary -- '*packages.lock.json' > lockfiles.patch
+          if [ -s lockfiles.patch ]; then echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Upload patch
+        if: steps.diff.outputs.changed == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: lockfiles-patch
+          path: lockfiles.patch
+
+  # Pushes made with GITHUB_TOKEN don't trigger workflows, so CI is dispatched explicitly on the fixed commit.
+  commit:
+    name: Commit lock files
+    needs: refresh
+    if: needs.refresh.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.head_ref }}
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: lockfiles-patch
+          path: ${{ runner.temp }}
+
+      - name: Apply patch (lock files only)
+        run: |
+          git apply --include='*packages.lock.json' "$RUNNER_TEMP/lockfiles.patch"
+          if git status --porcelain | grep -v 'packages.lock.json$'; then
+            echo "::error::Patch touched files other than packages.lock.json"
+            exit 1
+          fi
+
+      - name: Commit and push
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -am 'chore: refresh lock files'
+          git push
+
+      - name: Run CI on the fixed commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: gh workflow run ci.yml --ref "$HEAD_REF"
