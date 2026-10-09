@@ -2,7 +2,7 @@
 Last updated: 2026-10-09
 
 ## Where we stopped
-PROGRESS.md tracking added on `chore/progress-tracking` → push + PR it, then branch protection on `main`.
+PROGRESS.md tracking in PR #3 → merge it, then branch protection on `main`.
 
 ## Next (action points, in order)
 - [ ] Branch protection on `main` (required checks: "Build and test", "Analyze C#")
@@ -11,6 +11,7 @@ PROGRESS.md tracking added on `chore/progress-tracking` → push + PR it, then b
 - [ ] Optional: pack the template as a NuGet package (install without cloning)
 
 ## Waiting on
+- PR #3 (PROGRESS.md tracking) review/merge: me, since 2026-10-09
 - `gh` token missing `read:packages` scope: me, since 2026-10-07
 
 ## To discuss
