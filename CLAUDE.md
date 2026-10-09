@@ -1,5 +1,7 @@
 # Skeleton backend
 
+@PROGRESS.md
+
 .NET 10 (LTS) modular monolith. Minimal APIs, no mediator. No database or auth wired yet. Add them deliberately.
 
 ## Commands
