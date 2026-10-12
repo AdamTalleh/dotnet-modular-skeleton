@@ -7,6 +7,14 @@ It deliberately includes **no database, no auth and no mediator**. Each product 
 > This README documents the template itself and is **not** copied into generated products.
 > Products get `CLAUDE.md`, which describes the stack, commands and conventions.
 
+## How it works
+
+- **One process, many modules.** `Skeleton.Host` is only the composition root. Each business area is a module that implements `IModule` with two methods: `Register` (adds its services) and `MapEndpoints` (adds its routes). `Program.cs` lists the modules explicitly, so there's no assembly scanning.
+- **Modules stay isolated.** Every module has two projects: an `internal` implementation and a public `.Contracts` project (DTOs plus `I<Name>ModuleApi`). Other modules can reference only the Contracts project. Architecture tests fail the build if they reach past it, which keeps modules easy to split into separate services later.
+- **Request flow:** Minimal API endpoint → built-in validation (400) → handler → `Result<T>`. A success becomes 200/201. An `Error` becomes RFC 7807 ProblemDetails (404/400/409/500), and an unhandled exception becomes a 500 ProblemDetails.
+- **The Sample module** (`Notes`, in-memory store) shows the full pattern end to end: two features, Contracts, a unit test, an integration test and an architecture rule.
+- **Everything around the code is already set up:** central package versions with lock files, warnings as errors, formatting and analyzers, tests with coverage, CodeQL, Dependabot (lock files refreshed automatically), and a container image pushed to GHCR on every merge to `main`.
+
 ## What's inside
 
 | Concern | How | Package |
@@ -42,6 +50,15 @@ After creating it:
 1. `git init`, push to a new GitHub repo. CI runs straight away. On the first restore NuGet creates `packages.lock.json` files; commit them.
 2. Delete the Sample module when you no longer need it as a reference: remove `src/Modules/Sample`, `tests/*Sample.Tests`, their entries in the `.slnx`, the project reference and `new SampleModule()` line in the Host, and the Sample assertions in the integration tests.
 3. Add your DB, auth and modules.
+
+### Using it with an existing project
+
+The template is built for **new .NET HTTP backends**. For an existing .NET solution, copy the parts you need rather than generating a new one:
+- **Build rules:** `Directory.Build.props`, `Directory.Packages.props`, `global.json`, `.editorconfig`
+- **CI/CD:** `.github/workflows/*` and `.github/dependabot.yml` (adjust the solution and project paths)
+- **Module boundaries:** `src/Skeleton.SharedKernel` (`IModule`, `Result<T>`) and the `Skeleton.ArchitectureTests` rules
+
+It isn't meant for non-.NET stacks or frontends.
 
 ## Add a module
 
@@ -83,12 +100,26 @@ docker run -p 8080:8080 skeleton:latest
 | `ci.yml` → **container** | push to `main` / tags, after build passes | publishes `ghcr.io/<owner>/<repo>` tagged `sha-<short>` + `latest` (main) or `1.2.3` (tag `v1.2.3`) |
 | `codeql.yml` | PRs to `main`, push to `main`, weekly | CodeQL C# security analysis |
 | `dependabot.yml` | weekly | NuGet + GitHub Actions updates (OpenTelemetry grouped) |
+| `dependabot-lockfiles.yml` | Dependabot NuGet PRs | regenerates `packages.lock.json`, commits to the PR, then dispatches CI |
 
 **Release:** `git tag v1.2.3 && git push origin v1.2.3`.
 
 **Recommended repo settings** (GitHub → Settings):
 - *Branches → Add rule for `main`*: require a pull request, require the status checks **Build and test** and **Analyze C#**, block force pushes.
 - *Packages*: after the first image publish, set the GHCR package visibility (it starts private).
+
+## Not included yet
+
+These are left out on purpose. Each product adds what it needs.
+
+| Missing | Where it plugs in |
+|---|---|
+| Database / persistence | Per module, in `Register` (e.g. one EF Core `DbContext` and schema per module); register its health check for `/health/ready` |
+| Authentication / authorization | `AddAuthentication()` / `AddAuthorization()` hooks are already in `Program.cs`; add a scheme and a fallback policy |
+| Async messaging between modules | Today modules only call each other in-process through `I<Name>ModuleApi`; add events/outbox when needed |
+| Background jobs, caching, API versioning | Not wired |
+| Deployment | CI builds and pushes the image but deploys nowhere, and nothing checks the container starts (smoke test parked until there is a deploy target) |
+| NuGet-packaged template | Install currently needs a clone (`dotnet new install ./…`) |
 
 ## Gotchas
 

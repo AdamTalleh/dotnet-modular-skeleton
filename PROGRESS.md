@@ -2,7 +2,7 @@
 Last updated: 2026-10-12
 
 ## Where we stopped
-Branch protection on `main` live (verified on PR #6); local Docker dropped → verify lock-file workflow on the next Dependabot NuGet PR; meanwhile decide GHCR visibility.
+README: added How it works, Not included yet, existing-project usage (PR pending) → verify lock-file workflow on next Dependabot NuGet PR; decide GHCR visibility.
 
 ## Next (action points, in order)
 - [ ] Verify lock-file workflow on next Dependabot NuGet PR (bot commit + dispatched CI green; dispatched check satisfies required checks)
@@ -25,6 +25,7 @@ Branch protection on `main` live (verified on PR #6); local Docker dropped → v
 - 2026-10-07: README.md excluded from generated products; product docs live in CLAUDE.md. Why: template rename mangles README prose.
 
 ## Done
+- 2026-10-12: README overview sections + lock-file workflow row, README.md, verification: claims checked against code (status codes, paths); docs only, build/tests not run
 - 2026-10-12: Enabled branch protection on `main` via `gh api` (repo setting, no files), verification: protection read back via API matches
 - 2026-10-09: Added Dependabot lock-file workflow (restore in read-only job, commit in write job, then dispatch CI), .github/workflows/dependabot-lockfiles.yml, ci.yml (`workflow_dispatch`), verification: guard logic shell-tested; YAML lint not run (no actionlint/PyYAML); end-to-end needs a real Dependabot PR
 - 2026-10-09: PR #4 (lock-file workflow) merged to main (c3e1e86)
