@@ -1,8 +1,8 @@
 # Progress: dotnet-modular-skeleton
-Last updated: 2026-10-09
+Last updated: 2026-10-12
 
 ## Where we stopped
-Built Dependabot lock-file workflow on `ci/dependabot-lockfiles` → PR it, then verify on the next Dependabot NuGet PR.
+Lock-file workflow merged (PR #4) → verify on the next Dependabot NuGet PR (none open as of 2026-10-12).
 
 ## Next (action points, in order)
 - [ ] Verify lock-file workflow on next Dependabot NuGet PR (bot commit + dispatched CI green; dispatched check satisfies required checks)
@@ -25,6 +25,7 @@ Built Dependabot lock-file workflow on `ci/dependabot-lockfiles` → PR it, then
 
 ## Done
 - 2026-10-09: Added Dependabot lock-file workflow (restore in read-only job, commit in write job, then dispatch CI), .github/workflows/dependabot-lockfiles.yml, ci.yml (`workflow_dispatch`), verification: guard logic shell-tested; YAML lint not run (no actionlint/PyYAML); end-to-end needs a real Dependabot PR
+- 2026-10-09: PR #4 (lock-file workflow) merged to main (c3e1e86)
 - 2026-10-09: PR #2 and PR #3 merged to main
 - 2026-10-09: PR #2 fixed: regenerated ArchitectureTests + Host.IntegrationTests lock files for Scalar 2.17.14 (a12975a), verification: locked restore OK, Release build OK, tests 14/14
 - 2026-10-09: Added PROGRESS.md, `@PROGRESS.md` import, excluded PROGRESS.md from template output, PROGRESS.md, CLAUDE.md, .template.config/template.json, verification: JSON validated, build/tests not run (no code change)
