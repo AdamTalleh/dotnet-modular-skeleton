@@ -2,11 +2,10 @@
 Last updated: 2026-10-12
 
 ## Where we stopped
-Lock-file workflow merged (PR #4) → verify on the next Dependabot NuGet PR (none open as of 2026-10-12).
+Branch protection on `main` enabled; merge PR #5 → verify lock-file workflow on the next Dependabot NuGet PR (none open as of 2026-10-12).
 
 ## Next (action points, in order)
 - [ ] Verify lock-file workflow on next Dependabot NuGet PR (bot commit + dispatched CI green; dispatched check satisfies required checks)
-- [ ] Branch protection on `main` (required checks: "Build and test", "Analyze C#")
 - [ ] Decide GHCR package visibility (starts private)
 - [ ] Fix local Docker daemon (`docker info` panicked) and run the container once
 - [ ] Optional: pack the template as a NuGet package (install without cloning)
@@ -18,12 +17,14 @@ Lock-file workflow merged (PR #4) → verify on the next Dependabot NuGet PR (no
 - (none)
 
 ## Decisions
+- 2026-10-12: `main` protection: PR required (0 approvals), required checks "Build and test" + "Analyze C#" pinned to GitHub Actions, not strict, admins exempt. Why: enforces no-direct-push as solo dev; non-strict avoids rebasing every Dependabot PR; admin bypass for emergencies.
 - 2026-10-09: Keep Dependabot; auto-refresh lock files via workflow using GITHUB_TOKEN + `workflow_dispatch` of CI (no PAT). Why: no secret to rotate; GITHUB_TOKEN pushes don't trigger CI.
 - 2026-10-07: .NET 10 LTS modular monolith (IModule + per-module Contracts); no DB, auth or mediator yet. Why: minimal skeleton, add deliberately.
 - 2026-10-07: xUnit v3 on MTP + Shouldly, NetArchTest for boundaries, SDK container publish (no Dockerfile), CPM with lock files. Why: built-in/boring tooling.
 - 2026-10-07: README.md excluded from generated products; product docs live in CLAUDE.md. Why: template rename mangles README prose.
 
 ## Done
+- 2026-10-12: Enabled branch protection on `main` via `gh api` (repo setting, no files), verification: protection read back via API matches
 - 2026-10-09: Added Dependabot lock-file workflow (restore in read-only job, commit in write job, then dispatch CI), .github/workflows/dependabot-lockfiles.yml, ci.yml (`workflow_dispatch`), verification: guard logic shell-tested; YAML lint not run (no actionlint/PyYAML); end-to-end needs a real Dependabot PR
 - 2026-10-09: PR #4 (lock-file workflow) merged to main (c3e1e86)
 - 2026-10-09: PR #2 and PR #3 merged to main
