@@ -2,7 +2,7 @@
 Last updated: 2026-10-12
 
 ## Where we stopped
-README: added How it works, Not included yet, existing-project usage (PR pending) → verify lock-file workflow on next Dependabot NuGet PR; decide GHCR visibility.
+README: added How it works, Not included yet, existing-project usage (PR #8, merge it) → verify lock-file workflow on next Dependabot NuGet PR; decide GHCR visibility.
 
 ## Next (action points, in order)
 - [ ] Verify lock-file workflow on next Dependabot NuGet PR (bot commit + dispatched CI green; dispatched check satisfies required checks)
