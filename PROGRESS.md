@@ -2,12 +2,12 @@
 Last updated: 2026-10-12
 
 ## Where we stopped
-Branch protection on `main` enabled; merge PR #5 → verify lock-file workflow on the next Dependabot NuGet PR (none open as of 2026-10-12).
+Branch protection on `main` live (verified on PR #6); local Docker dropped → verify lock-file workflow on the next Dependabot NuGet PR; meanwhile decide GHCR visibility.
 
 ## Next (action points, in order)
 - [ ] Verify lock-file workflow on next Dependabot NuGet PR (bot commit + dispatched CI green; dispatched check satisfies required checks)
 - [ ] Decide GHCR package visibility (starts private)
-- [ ] Fix local Docker daemon (`docker info` panicked) and run the container once
+- [ ] Parked: CI container smoke test (run image, poll health endpoint) once a deploy target exists
 - [ ] Optional: pack the template as a NuGet package (install without cloning)
 
 ## Waiting on
@@ -17,6 +17,7 @@ Branch protection on `main` enabled; merge PR #5 → verify lock-file workflow o
 - (none)
 
 ## Decisions
+- 2026-10-12: Dropped local Docker fix; container check parked until a deploy target exists. Why: nothing depends on local Docker; a CI smoke test would cover it without it.
 - 2026-10-12: `main` protection: PR required (0 approvals), required checks "Build and test" + "Analyze C#" pinned to GitHub Actions, not strict, admins exempt. Why: enforces no-direct-push as solo dev; non-strict avoids rebasing every Dependabot PR; admin bypass for emergencies.
 - 2026-10-09: Keep Dependabot; auto-refresh lock files via workflow using GITHUB_TOKEN + `workflow_dispatch` of CI (no PAT). Why: no secret to rotate; GITHUB_TOKEN pushes don't trigger CI.
 - 2026-10-07: .NET 10 LTS modular monolith (IModule + per-module Contracts); no DB, auth or mediator yet. Why: minimal skeleton, add deliberately.
